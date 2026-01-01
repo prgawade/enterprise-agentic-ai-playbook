@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enterprise-agentic-ai-playbook"
+version = "0.1.0"
+description = "A comprehensive guide for implementing production-grade Agentic AI systems in enterprise environments"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Enterprise AI Team"}
+]
+keywords = ["ai", "agents", "enterprise", "llm", "automation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Documentation",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/enterprise-agentic-ai-playbook"
+Documentation = "https://github.com/your-org/enterprise-agentic-ai-playbook"
+Repository = "https://github.com/your-org/enterprise-agentic-ai-playbook"
+Issues = "https://github.com/your-org/enterprise-agentic-ai-playbook/issues"
+
+[tool.setuptools]
+packages = []
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
