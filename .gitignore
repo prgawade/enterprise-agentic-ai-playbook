@@ -37,10 +37,14 @@ env/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Environment variables
+# Environment variables (never commit secrets)
 .env
 .env.local
 .env.*.local
+
+# Generated reports (auto-created by the agent)
+*_analysis.json
+*_analysis.md
 
 # Logs
 *.log
