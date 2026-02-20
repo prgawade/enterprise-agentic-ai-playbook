@@ -1,211 +1,236 @@
 """
-Main entry point for Stock Analyst Agent
-Demonstrates the complete workflow
+Main CLI entry point for the Stock Analyst Agent.
+
+Usage examples
+--------------
+# Analyse TCS with the mock model (no LLM calls):
+  python main.py TCS --model mock
+
+# Analyse RELIANCE with Ollama and export Markdown:
+  python main.py RELIANCE --model ollama --export-md
+
+# Analyse INFY using specific prompts with Gemini:
+  python main.py INFY --model gemini --prompts 3_bull_vs_bear 9_valuation_sanity
+
+# Interactive mode:
+  python main.py --interactive --model mock
+
+# List available prompts:
+  python main.py --list-prompts
 """
 
+import json
+import logging
 import sys
 import argparse
 from typing import Optional
-from stock_analyst_agent import StockAnalystAgent
+
 from config import AgentConfig
 from mcp_client import SyncMCPStockClient
-import json
+from stock_analyst_agent import StockAnalystAgent, build_model_client
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Orchestrator
+# ---------------------------------------------------------------------------
 
 
 class StockAnalysisOrchestrator:
-    """Orchestrates the complete stock analysis workflow"""
-    
-    def __init__(self, model_type: str = "ollama", use_mcp: bool = True, mcp_base_url: str = "http://localhost:5000"):
-        """Initialize orchestrator"""
-        self.config = AgentConfig(
-            model_type=model_type,
-            use_mcp=use_mcp,
+    """Wires together config, MCP client, model client, and the agent."""
+
+    def __init__(
+        self,
+        model_type: str = "mock",
+        use_mcp: bool = True,
+        mcp_url: str = "https://lobehub.com/mcp/girishkumardv-live-nse-bse-mcp",
+    ) -> None:
+        self.config = AgentConfig(model_type=model_type, use_mcp=use_mcp, mcp_url=mcp_url)
+        self.model_client = build_model_client(model_type, self.config)
+        self.agent = StockAnalystAgent(
+            model=model_type,
+            model_client=self.model_client,
+            config=self.config,
         )
-        self.agent = StockAnalystAgent(model=model_type, use_mcp=use_mcp)
-        self.mcp_client = SyncMCPStockClient(base_url=mcp_base_url) if use_mcp else None
-    
+        self.mcp_client: Optional[SyncMCPStockClient] = (
+            SyncMCPStockClient(
+                base_url=mcp_url,
+                cache_ttl=self.config.cache_ttl,
+            )
+            if use_mcp
+            else None
+        )
+
+    # ------------------------------------------------------------------
+
     def fetch_live_data(self, stock_symbol: str) -> dict:
-        """Fetch live stock data from MCP server"""
+        """Return live context from the MCP server, or an empty dict."""
         if not self.mcp_client:
-            print("MCP client not initialized. Skipping live data fetch.")
+            logger.info("MCP disabled – skipping live data fetch.")
             return {}
-        
         try:
-            print(f"\nFetching live data for {stock_symbol}...")
+            print(f"\nFetching live data for {stock_symbol} …")
             context = self.mcp_client.get_stock_context(stock_symbol)
-            
-            print(f"Successfully fetched data:")
-            print(json.dumps(context, indent=2, default=str))
-            
+            print("Live data fetched:\n" + json.dumps(context, indent=2, default=str))
             return context
-        except Exception as e:
-            print(f"Error fetching live data: {str(e)}")
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Could not fetch live data for %s: %s", stock_symbol, exc)
             return {}
-    
-    def run_analysis(self, stock_name: str, specific_prompts: Optional[list] = None) -> dict:
-        """Run complete stock analysis"""
+
+    def run_analysis(
+        self, stock_name: str, specific_prompts: Optional[list] = None
+    ) -> dict:
+        """Fetch data, run prompts, return results dict."""
         print(f"\n{'='*80}")
         print(f"STOCK ANALYSIS: {stock_name.upper()}")
         print(f"{'='*80}")
-        
-        # Fetch live data if available
+
         live_data = self.fetch_live_data(stock_name)
-        
-        # Run analysis
-        analysis_result = self.agent.analyze_stock(stock_name, specific_prompts)
-        
-        # Combine results
-        analysis_result['live_data'] = live_data
-        
-        return analysis_result
-    
-    def interactive_mode(self):
-        """Interactive mode for continuous analysis"""
-        print("\n" + "="*80)
-        print("STOCK ANALYST AGENT - INTERACTIVE MODE")
-        print("="*80)
+        result = self.agent.analyze_stock(
+            stock_name, prompt_ids=specific_prompts, live_context=live_data
+        )
+        result["live_data"] = live_data
+        return result
+
+    def interactive_mode(self) -> None:
+        """Interactive REPL for continuous analysis."""
+        print("\n" + "=" * 80)
+        print("STOCK ANALYST AGENT – INTERACTIVE MODE")
+        print("=" * 80)
         print("\nAvailable prompts:")
-        for prompt_id, prompt_text in self.agent.PROMPTS.items():
-            print(f"  {prompt_id}: {prompt_text.split(chr(10))[0][:50]}...")
-        
+        for pid in self.agent.PROMPTS:
+            print(f"  {pid}")
+
         while True:
-            print("\n" + "-"*80)
+            print("\n" + "-" * 80)
             stock_input = input("Enter stock name (or 'quit' to exit): ").strip().upper()
-            
-            if stock_input.lower() == 'quit':
-                print("Exiting...")
+            if stock_input.lower() in {"quit", "exit", "q"}:
+                print("Exiting.")
                 break
-            
-            prompts_input = input("Enter prompt IDs (comma-separated, or 'all' for all): ").strip()
-            
-            if prompts_input.lower() == 'all' or not prompts_input:
-                specific_prompts = None
-            else:
-                specific_prompts = [p.strip() for p in prompts_input.split(',')]
-            
-            # Run analysis
+
+            prompts_input = input(
+                "Prompt IDs (comma-separated, or press Enter for all): "
+            ).strip()
+            specific_prompts = (
+                None
+                if not prompts_input or prompts_input.lower() == "all"
+                else [p.strip() for p in prompts_input.split(",")]
+            )
+
             result = self.run_analysis(stock_input, specific_prompts)
-            
-            # Save option
-            save_input = input("\nSave report? (y/n): ").strip().lower()
-            if save_input == 'y':
-                self.agent.save_report()
-                export_md = input("Also export as markdown? (y/n): ").strip().lower()
-                if export_md == 'y':
-                    self.agent.export_markdown_report()
+
+            save_input = input("\nSave JSON report? (y/n): ").strip().lower()
+            if save_input == "y":
+                path = self.agent.save_report()
+                print(f"Saved to {path}")
+
+            md_input = input("Export Markdown report? (y/n): ").strip().lower()
+            if md_input == "y":
+                path = self.agent.export_markdown_report()
+                print(f"Saved to {path}")
 
 
-def main():
-    """Main execution function"""
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+
+def main() -> None:
+    """Parse arguments and run analysis."""
     parser = argparse.ArgumentParser(
-        description="Stock Analyst Agent - Multi-Prompt Analysis System",
+        description="Stock Analyst Agent – Multi-Prompt Analysis System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Analyze TCS with Ollama
-  python main.py TCS --model ollama
-  
-  # Analyze RELIANCE with Gemini using specific prompts
-  python main.py RELIANCE --model gemini --prompts 1_market_mindset 4_bull_vs_bear
-  
-  # Interactive mode
-  python main.py --interactive --model claude
-  
-  # Without MCP (no live data)
-  python main.py INFY --no-mcp
-        """
+        epilog=__doc__,
     )
-    
+
     parser.add_argument(
         "stock_name",
-        nargs='?',
-        help="Stock name to analyze (e.g., TCS, RELIANCE, INFY)"
+        nargs="?",
+        help="Stock ticker/name to analyse (e.g. TCS, RELIANCE, INFY).",
     )
-    
     parser.add_argument(
         "--model",
-        choices=["ollama", "gemini", "claude"],
-        default="ollama",
-        help="LLM model to use (default: ollama)"
+        choices=["ollama", "gemini", "mock"],
+        default="mock",
+        help="LLM backend to use (default: mock).",
     )
-    
     parser.add_argument(
         "--prompts",
         nargs="+",
-        help="Specific prompt IDs to run (if not specified, runs all)"
+        metavar="PROMPT_ID",
+        help="Run only these prompt IDs (space-separated). Omit to run all.",
     )
-    
     parser.add_argument(
-        "--export-md",
-        action="store_true",
-        help="Export analysis as markdown report"
+        "--mcp-url",
+        default=None,
+        help="Override the MCP server URL.",
     )
-    
     parser.add_argument(
         "--no-mcp",
         action="store_true",
-        help="Don't use MCP server for live data"
+        help="Disable live MCP data fetch.",
     )
-    
     parser.add_argument(
-        "--mcp-url",
-        default="http://localhost:5000",
-        help="MCP server base URL"
+        "--export-md",
+        action="store_true",
+        help="Write a Markdown report alongside the JSON report.",
     )
-    
     parser.add_argument(
         "--interactive",
         action="store_true",
-        help="Run in interactive mode"
+        help="Launch interactive mode.",
     )
-    
     parser.add_argument(
         "--list-prompts",
         action="store_true",
-        help="List all available prompts"
+        help="Print all available prompt IDs and exit.",
     )
-    
+
     args = parser.parse_args()
-    
-    # Handle list prompts
+
+    # ------------------------------------------------------------------
     if args.list_prompts:
-        print("\nAvailable Prompts:")
-        print("="*80)
-        agent = StockAnalystAgent()
-        for prompt_id, prompt_text in agent.PROMPTS.items():
-            print(f"\n{prompt_id}:")
-            print("-" * 40)
-            print(prompt_text[:200] + "..." if len(prompt_text) > 200 else prompt_text)
+        from stock_analyst_agent import PROMPTS
+
+        print("\nAvailable prompts:")
+        print("=" * 80)
+        for pid, text in PROMPTS.items():
+            preview = text.split("\n")[0][:70]
+            print(f"  {pid:35s}  {preview}")
         return
-    
-    # Initialize orchestrator
+
+    # Resolve MCP URL
+    from config import DEFAULT_MCP_URL
+
+    mcp_url = args.mcp_url or DEFAULT_MCP_URL
+
     orchestrator = StockAnalysisOrchestrator(
         model_type=args.model,
         use_mcp=not args.no_mcp,
-        mcp_base_url=args.mcp_url,
+        mcp_url=mcp_url,
     )
-    
-    # Interactive mode
+
     if args.interactive:
         orchestrator.interactive_mode()
         return
-    
-    # Check if stock name provided
+
     if not args.stock_name:
         parser.print_help()
         sys.exit(1)
-    
-    # Run analysis
+
     result = orchestrator.run_analysis(args.stock_name, args.prompts)
-    
-    # Save reports
-    orchestrator.agent.save_report()
+
+    json_path = orchestrator.agent.save_report()
+    print(f"\nJSON report saved to: {json_path}")
+
     if args.export_md:
-        orchestrator.agent.export_markdown_report()
-    
-    print("\n" + "="*80)
-    print("ANALYSIS COMPLETE!")
-    print("="*80)
+        md_path = orchestrator.agent.export_markdown_report()
+        print(f"Markdown report saved to: {md_path}")
+
+    print("\n" + "=" * 80)
+    print("ANALYSIS COMPLETE")
+    print("=" * 80)
 
 
 if __name__ == "__main__":
