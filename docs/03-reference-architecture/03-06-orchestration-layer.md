@@ -904,7 +904,7 @@ RetryPolicy(
 ```
 
 **2. Circuit Breaker:**
-```python
+```yaml
 # Dapr resiliency policy
 apiVersion: dapr.io/v1alpha1
 kind: Resiliency
