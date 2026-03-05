@@ -500,5 +500,5 @@ class EventListener:
 
 ---
 
-**Next:** [4. Design Patterns & Engineering](../../README.md#4-design-patterns--engineering) | [Previous: 3.4 Core Agentic Layer](03-04-core-agentic-layer.md) | [Back to TOC](../../README.md)
+**Next:** [3.6 Cloud-Agnostic Orchestration Layer](03-06-orchestration-layer.md) | [Previous: 3.4 Core Agentic Layer](03-04-core-agentic-layer.md) | [Back to TOC](../../README.md)
 

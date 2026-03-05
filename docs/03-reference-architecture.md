@@ -604,6 +604,38 @@ User Action → OS Event → Agent Gateway → Agent Runtime → Results → UI 
 
 ---
 
+## 3.6 Cloud-Agnostic Orchestration Layer
+
+The orchestration layer is the central nervous system of an enterprise agentic AI platform, coordinating agent lifecycles, managing workflow execution, and ensuring reliable multi-agent collaboration. A cloud-agnostic approach avoids vendor lock-in and supports hybrid and multi-cloud deployments.
+
+**Core Capabilities:**
+- Workflow definition (code, graphs, or visual DAGs)
+- Durable state management and recovery
+- Multi-agent coordination (supervisor, hierarchical, swarm)
+- Error handling with retries, circuit breakers, and saga patterns
+- Enterprise security (RBAC, secrets management, network isolation)
+- Integration with knowledge bases and services via MCP
+
+**Platform Options:**
+- **Temporal** — Durable workflow engine, mission-critical agent workflows
+- **Apache Airflow** — Mature DAG-based orchestration with 2,000+ connectors
+- **Prefect** — Modern Pythonic workflows with hybrid execution
+- **Dapr** — Cloud-agnostic microservices runtime with workflow engine
+- **LangGraph** — AI-native graph-based agent orchestration
+- **Flyte** — Kubernetes-native, ML-focused workflow platform
+- **Argo Workflows** — Container-per-step Kubernetes orchestration
+- **Conductor** — Microservices workflow orchestration (Netflix-proven)
+- **n8n** — Low code visual workflow builder with AI agent nodes
+- **Kafka + Custom** — Event-driven orchestration for high-throughput systems
+
+**Low Code vs. Pro Code:**
+- Low code options (n8n, Conductor) serve citizen developers and rapid prototyping
+- Pro code options (Temporal, LangGraph, Dapr) serve engineering teams building complex systems
+
+For a detailed analysis including scalability benchmarks, security comparisons, performance characteristics, multi-agent coordination patterns, and selection guidance, see the [Cloud-Agnostic Orchestration Layer Deep Dive](03-reference-architecture/03-06-orchestration-layer.md).
+
+---
+
 ## Key Takeaways
 
 1. **Layered architecture:** Clear separation of concerns from infrastructure to application
@@ -611,6 +643,7 @@ User Action → OS Event → Agent Gateway → Agent Runtime → Results → UI 
 3. **Standardization:** MCP provides consistent resource access
 4. **Security:** Sandboxing and access control at every layer
 5. **Flexibility:** Support for multiple models, frameworks, and deployment patterns
+6. **Cloud-agnostic orchestration:** Avoid vendor lock-in with portable orchestration platforms that run on any infrastructure
 
 Next: [4. Design Patterns & Engineering](../docs/04-design-patterns.md)
 
