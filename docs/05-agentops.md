@@ -53,6 +53,8 @@ app = workflow.compile()
 - Learning curve for graph-based thinking
 - Requires understanding of state management
 
+For a comprehensive guide on making OSS LangGraph production-grade — covering deployment for scale, security hardening, observability, concurrency control, cost management, and operational maintenance — see the [Making OSS LangGraph Production-Grade Deep Dive](05-agentops/05-04-langgraph-production-guide.md).
+
 ### Microsoft Semantic Kernel & AutoGen
 
 **Overview:** Enterprise-grade orchestration frameworks from Microsoft
@@ -647,6 +649,7 @@ def agent_execution_with_correction(task):
 3. **Template reuse:** Leverage agent templates for common patterns
 4. **Continuous improvement:** Implement feedback loops for learning
 5. **Human oversight:** Strategic HITL integration for quality and safety
+6. **Production readiness:** Follow the [OSS LangGraph Production Guide](05-agentops/05-04-langgraph-production-guide.md) for deployment, security, observability, concurrency, cost, and maintenance best practices
 
 Next: [6. Evaluation & Reliability](../docs/06-evaluation-reliability.md)
 
