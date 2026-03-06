@@ -485,5 +485,15 @@ def execute_agent(agent_id: str, goal: str):
 
 ---
 
+## Cloud-Agnostic Orchestration Options
+
+For a comprehensive evaluation of cloud-agnostic orchestration platforms—including detailed comparisons of Temporal, LangGraph, Apache Airflow, Dapr, Kubernetes-native (Argo), Prefect, and Ray—see the dedicated deep-dive:
+
+**→ [3.4a Cloud-Agnostic Agentic AI Orchestration Layer](03-04a-cloud-agnostic-orchestration.md)**
+
+This section covers enterprise scalability, low-code/pro-code options, performance benchmarks, security architecture, knowledge and service integrations, reliability and resiliency patterns, multi-agent coordination, and platform selection guidance.
+
+---
+
 **Next:** [3.5 Application Layer](03-05-application-layer.md) | [Previous: 3.3 Model Layer](03-03-model-layer.md) | [Back to TOC](../../README.md)
 
