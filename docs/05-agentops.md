@@ -449,7 +449,7 @@ memory:
 
 ---
 
-## 5.4 Feedback & Learning
+## 5.5 Feedback & Learning
 
 Enabling agents to improve through human feedback and automated learning mechanisms.
 
