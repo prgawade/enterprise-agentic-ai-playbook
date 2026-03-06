@@ -31,7 +31,8 @@ A comprehensive guide for technical leaders to implement production-grade Agenti
 * [5.2 MCP Development](docs/05-agentops.md#52-mcp-development)
 * [5.3 Agent Templates](docs/05-agentops.md#53-agent-templates)
 * [5.4 Making OSS LangGraph Production-Grade](docs/05-agentops/05-04-langgraph-production-guide.md)
-* [5.5 Feedback & Learning](docs/05-agentops.md#55-feedback--learning)
+* [5.5 Scaling LangGraph with KEDA & Dapr + Unified Observability](docs/05-agentops/05-05-langgraph-keda-dapr-observability.md)
+* [5.6 Feedback & Learning](docs/05-agentops.md#56-feedback--learning)
 
 ### [6. Evaluation & Reliability](docs/06-evaluation-reliability.md)
 * [6.1 Multi-Tier Evaluation Framework](docs/06-evaluation-reliability.md#61-multi-tier-evaluation-framework)

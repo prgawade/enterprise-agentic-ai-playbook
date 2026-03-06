@@ -55,6 +55,8 @@ app = workflow.compile()
 
 For a comprehensive guide on making OSS LangGraph production-grade — covering deployment for scale, security hardening, observability, concurrency control, cost management, and operational maintenance — see the [Making OSS LangGraph Production-Grade Deep Dive](05-agentops/05-04-langgraph-production-guide.md).
 
+For scaling LangGraph with KEDA and Dapr on Kubernetes, and building a unified observability strategy across agent tracing, user tracking, infrastructure metrics, and application logs — see the [Scaling LangGraph with KEDA & Dapr + Unified Observability Deep Dive](05-agentops/05-05-langgraph-keda-dapr-observability.md).
+
 ### Microsoft Semantic Kernel & AutoGen
 
 **Overview:** Enterprise-grade orchestration frameworks from Microsoft
@@ -449,7 +451,7 @@ memory:
 
 ---
 
-## 5.5 Feedback & Learning
+## 5.6 Feedback & Learning
 
 Enabling agents to improve through human feedback and automated learning mechanisms.
 
@@ -650,6 +652,7 @@ def agent_execution_with_correction(task):
 4. **Continuous improvement:** Implement feedback loops for learning
 5. **Human oversight:** Strategic HITL integration for quality and safety
 6. **Production readiness:** Follow the [OSS LangGraph Production Guide](05-agentops/05-04-langgraph-production-guide.md) for deployment, security, observability, concurrency, cost, and maintenance best practices
+7. **Scaling & observability:** Use [KEDA + Dapr for Kubernetes scaling](05-agentops/05-05-langgraph-keda-dapr-observability.md) and unified monitoring with agent, user, infrastructure, and application log correlation
 
 Next: [6. Evaluation & Reliability](../docs/06-evaluation-reliability.md)
 
