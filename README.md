@@ -19,6 +19,7 @@ A comprehensive guide for technical leaders to implement production-grade Agenti
 * [3.3 Model Layer](docs/03-reference-architecture.md#33-model-layer)
 * [3.4 Core Agentic Layer](docs/03-reference-architecture.md#34-core-agentic-layer)
 * [3.5 Application Layer](docs/03-reference-architecture.md#35-application-layer)
+* [3.6 Cloud-Agnostic Orchestration Layer](docs/03-reference-architecture/03-06-orchestration-layer.md)
 
 ### [4. Design Patterns & Engineering](docs/04-design-patterns.md)
 * [4.1 Single Agent Architectures](docs/04-design-patterns.md#41-single-agent-architectures)
